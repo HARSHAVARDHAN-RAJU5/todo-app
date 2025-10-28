@@ -1,9 +1,16 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import "./App.css";
 
 function App() {
   const [tasks, setTasks] = useState([]);
   const [input, setInput] = useState("");
+
+  useEffect(() => {
+    fetch("http://localhost:5000")
+      .then((res) => res.text())
+      .then((data) => console.log("Backend says:", data))
+      .catch((err) => console.error("Error:", err));
+  }, []);
 
   const addTask = () => {
     if (input.trim() === "") return;
