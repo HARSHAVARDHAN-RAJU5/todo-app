@@ -6,21 +6,40 @@ function App() {
   const [input, setInput] = useState("");
 
   useEffect(() => {
-    fetch("http://localhost:5000")
-      .then((res) => res.text())
-      .then((data) => console.log("Backend says:", data))
+    fetch("http://localhost:5000/tasks")
+      .then((res) => res.json())
+      .then((data) => setTasks(data))
       .catch((err) => console.error("Error:", err));
   }, []);
 
-  const addTask = () => {
+  const addTask = async () => {
     if (input.trim() === "") return;
-    setTasks([...tasks, input]);
+  
+    const res = await fetch("http://localhost:5000/tasks", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ task: input }),
+    });
+
+    const data = await res.json();
+    setTasks(data.tasks);
     setInput("");
   };
 
-  const deleteTask = (index) => {
-    setTasks(tasks.filter((_, i) => i !== index));
+
+  const deleteTask = async (id) => {
+    try {
+      const response = await fetch(`http://localhost:5000/tasks/${id}`, {
+        method: "DELETE",
+      });
+      const data = await response.json();
+        setTasks(data.tasks);
+        setInput("");
+      } catch (error) {
+        console.error("Error deleting task:", error);
+      }
   };
+
 
   return (
     <div className="app">
